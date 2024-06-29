@@ -8,7 +8,7 @@ def test_authorization(api_token):
     assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
     print("Authorization test passed")
 
-api_token = 'your_api_token'
+api_token = 'OAuth y0_AgAAAABxCO1lAAG8XgAAAAD3K_a45fHKSCJ4TS-eIyM6ViaC9jr6iYY'
 test_authorization(api_token)
 
 def test_search_track(api_token, track_name):
@@ -36,7 +36,7 @@ def test_create_and_edit_playlist(api_token):
     create_data = {
         'title': 'Test Playlist',
     }
-    create_response = requests.post('https://api.music.yandex.net/users/{user_id}/playlists/create', headers=headers, json=create_data)
+    create_response = requests.post('https://yandex-music-cors-proxy.onrender.com/https://api.music.yandex.net:443/users/1896410469/playlists/create', headers=headers, json=create_data)
     assert create_response.status_code == 200, f"Expected status code 200, but got {create_response.status_code}"
     playlist_id = create_response.json()['result']['playlist']['kind']
     
@@ -45,7 +45,7 @@ def test_create_and_edit_playlist(api_token):
         'kind': playlist_id,
         'trackIds': ['12345678'],  # Example track ID
     }
-    add_response = requests.post(f'https://api.music.yandex.net/users/{user_id}/playlists/{playlist_id}/change-relative', headers=headers, json=add_track_data)
+    add_response = requests.post(f'https://yandex-music-cors-proxy.onrender.com/https://api.music.yandex.net:443/users/1896410469/playlists/1007/change-relative', headers=headers, json=add_track_data)
     assert add_response.status_code == 200, f"Expected status code 200, but got {add_response.status_code}"
     
     print("Create and edit playlist test passed")

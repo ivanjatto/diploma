@@ -21,13 +21,13 @@ def login(username, password):
 
 # Тест 1: Вход и проверка главной страницы
 def test_login():
-    login("your_username", "your_password")
+    login("newivannovikov@yandex.ru", "Dimaloh1337")
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h1[text()='Главное']")))
     print("Login test passed")
 
 # Тест 2: Поиск и воспроизведение трека
 def test_search_and_play_track():
-    login("your_username", "your_password")
+    login("newivannovikov@yandex.ru", "Dimaloh1337")
     search_box = driver.find_element(By.XPATH, "//input[@placeholder='Исполнитель, трек, альбом или плейлист']")
     search_box.send_keys("Imagine Dragons")
     search_box.send_keys(Keys.RETURN)
@@ -40,7 +40,7 @@ def test_search_and_play_track():
 
 # Тест 3: Создание и редактирование плейлиста
 def test_create_and_edit_playlist():
-    login("your_username", "your_password")
+    login("newivannovikov@yandex.ru", "Dimaloh1337")
     driver.find_element(By.XPATH, "//span[text()='Моя музыка']").click()
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Плейлисты']")))
     driver.find_element(By.XPATH, "//span[text()='Создать плейлист']").click()
@@ -58,7 +58,7 @@ def test_create_and_edit_playlist():
 
 # Тест 4: Работа в оффлайн-режиме
 def test_offline_mode():
-    login("your_username", "your_password")
+    login("newivannovikov@yandex.ru", "Dimaloh1337")
     driver.find_element(By.XPATH, "//div[text()='Моя музыка']").click()
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[text()='Оффлайн-треки']")))
     driver.find_element(By.XPATH, "//div[text()='Оффлайн-треки']").click()
@@ -71,7 +71,7 @@ def test_offline_mode():
 
 # Тест 5: Работа радиостанций
 def test_radio():
-    login("your_username", "your_password")
+    login("newivannovikov@yandex.ru", "Dimaloh1337")
     driver.find_element(By.XPATH, "//div[text()='Радио']").click()
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='d-radiostation__title']")))
     radio_station = driver.find_element(By.XPATH, "//div[@class='d-radiostation__title']")
