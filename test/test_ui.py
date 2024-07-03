@@ -1,91 +1,54 @@
-from selenium import webdriver # type: ignore
-from selenium.webdriver.common.keys import Keys # type: ignore
-from selenium.webdriver.common.by import By # type: ignore
-from selenium.webdriver.support.ui import WebDriverWait # type: ignore
-from selenium.webdriver.support import expected_conditions as EC # type: ignore
-import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-# Инициализация драйвера
-driver = webdriver.Chrome()
-
-# URL приложения Яндекс.Музыка
-base_url = "https://music.yandex.ru/"
-
-# Вспомогательная функция для авторизации
-def login(username, password):
-    driver.get(base_url)
-    driver.find_element(By.XPATH, "//span[text()='Войти']").click()
-    driver.find_element(By.NAME, "login").send_keys(username)
-    driver.find_element(By.NAME, "passwd").send_keys(password)
+def test_authorization():
+    driver = webdriver.Chrome()
+    driver.get("https://www.kinopoisk.ru/")
+    
+    driver.find_element(By.XPATH, "//a[text()='Войти']").click()
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "login")))
+    
+    driver.find_element(By.NAME, "login").send_keys("your_username")
+    driver.find_element(By.NAME, "password").send_keys("your_password")
     driver.find_element(By.XPATH, "//button[text()='Войти']").click()
+    
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='your_username']")))
+    print("Authorization test passed")
+    driver.quit()
 
-# Тест 1: Вход и проверка главной страницы
-def test_login():
-    login("newivannovikov@yandex.ru", "Dimaloh1337")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h1[text()='Главное']")))
-    print("Login test passed")
+test_authorization()
 
-# Тест 2: Поиск и воспроизведение трека
-def test_search_and_play_track():
-    login("newivannovikov@yandex.ru", "Dimaloh1337")
-    search_box = driver.find_element(By.XPATH, "//input[@placeholder='Исполнитель, трек, альбом или плейлист']")
-    search_box.send_keys("Imagine Dragons")
+
+def test_get_movie_info():
+    driver = webdriver.Chrome()
+    driver.get("https://www.kinopoisk.ru/")
+    
+    search_box = driver.find_element(By.NAME, "kp_query")
+    search_box.send_keys("Inception")
     search_box.send_keys(Keys.RETURN)
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='d-track__name']")))
-    track = driver.find_element(By.XPATH, "//div[@class='d-track__name']")
-    track.click()
-    play_button = driver.find_element(By.XPATH, "//button[@aria-label='Воспроизвести']")
-    play_button.click()
-    print("Search and play track test passed")
+    
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='element most_wanted']")))
+    driver.find_element(By.XPATH, "//div[@class='element most_wanted']").click()
+    
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h1[text()='Inception']")))
+    print("Get movie info test passed")
+    driver.quit()
 
-# Тест 3: Создание и редактирование плейлиста
-def test_create_and_edit_playlist():
-    login("newivannovikov@yandex.ru", "Dimaloh1337")
-    driver.find_element(By.XPATH, "//span[text()='Моя музыка']").click()
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Плейлисты']")))
-    driver.find_element(By.XPATH, "//span[text()='Создать плейлист']").click()
-    playlist_name = "My Test Playlist"
-    driver.find_element(By.XPATH, "//input[@placeholder='Название']").send_keys(playlist_name)
-    driver.find_element(By.XPATH, "//button[text()='Сохранить']").click()
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//span[text()='{playlist_name}']")))
-    driver.find_element(By.XPATH, "//span[text()='Добавить треки']").click()
-    driver.find_element(By.XPATH, "//input[@placeholder='Исполнитель, трек, альбом или плейлист']").send_keys("Imagine Dragons")
-    driver.find_element(By.XPATH, "//input[@placeholder='Исполнитель, трек, альбом или плейлист']").send_keys(Keys.RETURN)
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='d-track__name']")))
-    driver.find_element(By.XPATH, "//div[@class='d-track__name']").click()
-    driver.find_element(By.XPATH, "//button[text()='Добавить в плейлист']").click()
-    print("Create and edit playlist test passed")
+test_get_movie_info()
 
-# Тест 4: Работа в оффлайн-режиме
-def test_offline_mode():
-    login("newivannovikov@yandex.ru", "Dimaloh1337")
-    driver.find_element(By.XPATH, "//div[text()='Моя музыка']").click()
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[text()='Оффлайн-треки']")))
-    driver.find_element(By.XPATH, "//div[text()='Оффлайн-треки']").click()
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='d-track__name']")))
-    track = driver.find_element(By.XPATH, "//div[@class='d-track__name']")
-    track.click()
-    play_button = driver.find_element(By.XPATH, "//button[@aria-label='Воспроизвести']")
-    play_button.click()
-    print("Offline mode test passed")
+def test_get_popular_movies():
+    driver = webdriver.Chrome()
+    driver.get("https://www.kinopoisk.ru/")
+    
+    driver.find_element(By.XPATH, "//a[text()='Фильмы']").click()
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//h1[text()='Популярные фильмы']")))
+    
+    popular_movies = driver.find_elements(By.XPATH, "//div[@class='movie-item']")
+    assert len(popular_movies) > 0, "No popular movies found"
+    print("Get popular movies test passed")
+    driver.quit()
 
-# Тест 5: Работа радиостанций
-def test_radio():
-    login("newivannovikov@yandex.ru", "Dimaloh1337")
-    driver.find_element(By.XPATH, "//div[text()='Радио']").click()
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@class='d-radiostation__title']")))
-    radio_station = driver.find_element(By.XPATH, "//div[@class='d-radiostation__title']")
-    radio_station.click()
-    play_button = driver.find_element(By.XPATH, "//button[@aria-label='Воспроизвести']")
-    play_button.click()
-    print("Radio test passed")
-
-# Запуск тестов
-test_login()
-test_search_and_play_track()
-test_create_and_edit_playlist()
-test_offline_mode()
-test_radio()
-
-# Закрытие драйвера
-driver.quit()
+test_get_popular_movies()

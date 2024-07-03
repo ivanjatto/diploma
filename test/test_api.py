@@ -2,82 +2,38 @@ import requests
 
 def test_authorization(api_token):
     headers = {
-        'Authorization': f'OAuth {api_token}',
+        'Authorization': f'Bearer {api_token}',
     }
-    response = requests.get('https://api.music.yandex.net/account/status', headers=headers)
+    response = requests.get('https://api.kinopoisk.dev/v1.3/account/status', headers=headers)
     assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
     print("Authorization test passed")
 
-api_token = 'OAuth y0_AgAAAABxCO1lAAG8XgAAAAD3K_a45fHKSCJ4TS-eIyM6ViaC9jr6iYY'
+api_token = 'SBQJJPG-MAW4Y7E-HXAT1KZ-9PSDPJC'
 test_authorization(api_token)
 
-def test_search_track(api_token, track_name):
+def test_search_movie(api_token, movie_title):
     headers = {
-        'Authorization': f'OAuth {api_token}',
+        'Authorization': f'Bearer {api_token}',
     }
     params = {
-        'text': track_name,
-        'type': 'track',
+        'query': movie_title,
     }
-    response = requests.get('https://api.music.yandex.net/search', headers=headers, params=params)
+    response = requests.get('https://api.kinopoisk.dev/v1.3/movie/search', headers=headers, params=params)
     assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
     search_results = response.json()
-    assert 'tracks' in search_results['result'], "No tracks found in search results"
-    print("Search track test passed")
+    assert 'docs' in search_results, "No movies found in search results"
+    print("Search movie test passed")
 
-test_search_track(api_token, 'Imagine Dragons')
+test_search_movie(api_token, 'Inception')
 
-def test_create_and_edit_playlist(api_token):
+def test_get_popular_movies(api_token):
     headers = {
-        'Authorization': f'OAuth {api_token}',
+        'Authorization': f'Bearer {api_token}',
     }
-    
-    # Create playlist
-    create_data = {
-        'title': 'Test Playlist',
-    }
-    create_response = requests.post('https://yandex-music-cors-proxy.onrender.com/https://api.music.yandex.net:443/users/1896410469/playlists/create', headers=headers, json=create_data)
-    assert create_response.status_code == 200, f"Expected status code 200, but got {create_response.status_code}"
-    playlist_id = create_response.json()['result']['playlist']['kind']
-    
-    # Add track to playlist
-    add_track_data = {
-        'kind': playlist_id,
-        'trackIds': ['12345678'],  # Example track ID
-    }
-    add_response = requests.post(f'https://yandex-music-cors-proxy.onrender.com/https://api.music.yandex.net:443/users/1896410469/playlists/1007/change-relative', headers=headers, json=add_track_data)
-    assert add_response.status_code == 200, f"Expected status code 200, but got {add_response.status_code}"
-    
-    print("Create and edit playlist test passed")
-
-test_create_and_edit_playlist(api_token)
-
-def test_offline_tracks(api_token):
-    headers = {
-        'Authorization': f'OAuth {api_token}',
-    }
-    response = requests.get('https://api.music.yandex.net/account/offlineTracks', headers=headers)
+    response = requests.get('https://api.kinopoisk.dev/v1.3/movie/popular', headers=headers)
     assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
-    offline_tracks = response.json()
-    assert 'result' in offline_tracks, "No offline tracks found"
-    print("Offline tracks test passed")
+    popular_movies = response.json()
+    assert 'docs' in popular_movies, "No popular movies found in response"
+    print("Get popular movies test passed")
 
-test_offline_tracks(api_token)
-
-def test_radio_stations(api_token):
-    headers = {
-        'Authorization': f'OAuth {api_token}',
-    }
-    response = requests.get('https://api.music.yandex.net/rotor/stations/list', headers=headers)
-    assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
-    stations = response.json()
-    assert 'result' in stations, "No radio stations found"
-
-    # Play a specific radio station (example station id)
-    station_id = stations['result'][0]['id']
-    play_response = requests.get(f'https://api.music.yandex.net/rotor/station/{station_id}/tracks', headers=headers)
-    assert play_response.status_code == 200, f"Expected status code 200, but got {play_response.status_code}"
-    
-    print("Radio stations test passed")
-
-test_radio_stations(api_token)
+test_get_popular_movies(api_token)
