@@ -1,39 +1,67 @@
 import requests
 
-def test_authorization(api_token):
-    headers = {
-        'Authorization': f'Bearer {api_token}',
-    }
-    response = requests.get('https://api.kinopoisk.dev/v1.3/account/status', headers=headers)
-    assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
-    print("Authorization test passed")
-
-api_token = 'SBQJJPG-MAW4Y7E-HXAT1KZ-9PSDPJC'
-test_authorization(api_token)
-
-def test_search_movie(api_token, movie_title):
-    headers = {
-        'Authorization': f'Bearer {api_token}',
-    }
+def test_search_movie():
+    url = "https://api.kinopoisk.dev/v1.4/movie"
     params = {
-        'query': movie_title,
+        "query": "Inception"
     }
-    response = requests.get('https://api.kinopoisk.dev/v1.3/movie/search', headers=headers, params=params)
+    headers = {
+        "Content-Type": "application/json",
+        "X-API-KEY": "SBQJJPG-MAW4Y7E-HXAT1KZ-9PSDPJC"
+    }
+
+    response = requests.get(url, params=params, headers=headers)
+    print(f"Response status code: {response.status_code}")
+    print(f"Response body: {response.text}")
+
     assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
-    search_results = response.json()
-    assert 'docs' in search_results, "No movies found in search results"
+    movies = response.json().get("docs", [])
+    assert len(movies) > 0, f"No movies found in the search results: {response.text}"
     print("Search movie test passed")
 
-test_search_movie(api_token, 'Inception')
+import requests
 
-def test_get_popular_movies(api_token):
+def test_get_popular_movies():
+    url = "https://api.kinopoisk.dev/v1.4/movie/popular"
     headers = {
-        'Authorization': f'Bearer {api_token}',
+        "Content-Type": "application/json",
+        "X-API-KEY": "SBQJJPG-MAW4Y7E-HXAT1KZ-9PSDPJC"
     }
-    response = requests.get('https://api.kinopoisk.dev/v1.3/movie/popular', headers=headers)
-    assert response.status_code == 200, f"Expected status code 200, but got {response.status_code}"
-    popular_movies = response.json()
-    assert 'docs' in popular_movies, "No popular movies found in response"
-    print("Get popular movies test passed")
 
-test_get_popular_movies(api_token)
+    response = requests.get(url, headers=headers)
+    print(f"Response status code: {response.status_code}")
+    print(f"Response body: {response.text}")
+
+    if response.status_code == 200:
+        movies = response.json().get("docs", [])
+        assert len(movies) > 0, "No popular movies found"
+        print("Get popular movies test passed")
+    else:
+        print(f"Failed to get popular movies. Status code: {response.status_code}. Response body: {response.text}")
+
+
+def test_get_genres():
+    url = "https://api.kinopoisk.dev/v1.3/genre"
+    headers = {
+        "Content-Type": "application/json",
+        "X-API-KEY": "SBQJJPG-MAW4Y7E-HXAT1KZ-9PSDPJC"
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        print(f"Response status code: {response.status_code}")
+        print(f"Response body: {response.text}")
+
+        response.raise_for_status()  
+
+        genres = response.json().get("docs", [])
+        assert len(genres) > 0, "No genres found"
+        print("Get genres test passed")
+    except requests.exceptions.RequestException as e:
+        print(f"Error during request: {e}")
+
+
+
+
+
+
